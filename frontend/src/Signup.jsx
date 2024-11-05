@@ -94,7 +94,7 @@ const Signup = () => {
             return;
         }
 
-        axios.post('http://localhost:3002/register', { name, email, password })
+        axios.post('https://hostel-backend-e7gv.onrender.com/register', { name, email, password })
             .then(result => {
                 setMessage("Registration successful! Check your email for confirmation.");
                 setTimeout(() => {
