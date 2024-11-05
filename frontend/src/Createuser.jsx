@@ -7,7 +7,7 @@ const Createuser = () => {
     const navigate = useNavigate()
     const Submit=(e)=>{
         e.preventDefault();
-        axios.post('http://localhost:3002/create',{name,rollno})
+        axios.post('https://hostel-backend-e7gv.onrender.com/create',{name,rollno})
         .then(result=>{console.log(result)
             navigate('/users1')
         })
