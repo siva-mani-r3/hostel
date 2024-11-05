@@ -11,7 +11,7 @@ useEffect(()=>{
 
 },[])
 const handleDelete =(id)=>{
-    axios.delete('https://hostel-backend-e7gv.onrender.com/deleteUser1/'+id)
+    axios.delete(`https://hostel-backend-e7gv.onrender.com/deleteUser1/${id}`)
     .then(res=>{console.log(res)
 window.location.reload()})
     .catch(err=>console.log(err))
