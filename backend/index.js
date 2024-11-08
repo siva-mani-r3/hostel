@@ -741,7 +741,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const nodemailer = require('nodemailer'); // Import nodemailer
+const nodemailer = require('nodemailer'); 
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -755,8 +755,6 @@ const UserModel4 = require('./models/Users5');
 const UserModel5 = require('./models/Users6');
 const UserModel6 = require('./models/Users7');
 const UserModel7 = require('./models/Users8');
-
-
 mongoose.connect("mongodb+srv://Author:sivamani@cluster0.mebcwvx.mongodb.net/students")
     .then(() => {
         console.log("MongoDB Connected Successfully!");
@@ -764,16 +762,14 @@ mongoose.connect("mongodb+srv://Author:sivamani@cluster0.mebcwvx.mongodb.net/stu
     .catch((error) => {
         console.log(`${error}`);
     });
-
 // Nodemailer setup
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: 'sivamaniramayanam7036@gmail.com',
-        pass: 'gjrm tarz sjgg sqtr' // Ensure to keep your credentials secure
+        pass: 'gjrm tarz sjgg sqtr' 
     }
 });
-
 // Email sending function
 const sendRegistrationEmail = (userEmail, userPassword) => {
     const mailOptions = {
@@ -782,7 +778,6 @@ const sendRegistrationEmail = (userEmail, userPassword) => {
         subject: 'Hostel Management Registration Successful',
         text: `Thank you for registering with our hostel management system.\n\nYour login credentials are:\nEmail: ${userEmail}\nPassword: ${userPassword}\n\nPlease keep this information secure.`
     };
-
     transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
             console.log(error);
@@ -791,9 +786,8 @@ const sendRegistrationEmail = (userEmail, userPassword) => {
         }
     });
 };
-
 const notifyVacancyToStudents = (availableRooms) => {
-    // Retrieve all students from the StudentModel
+ 
     StudentModel.find({}, 'email') // Only fetch the email field
         .then(students => {
             const emailAddresses = students.map(student => student.email); // Extract email addresses
@@ -806,7 +800,6 @@ const notifyVacancyToStudents = (availableRooms) => {
                 console.log('No students to notify.');
                 return;
             }
-
             // Prepare the email options
             const mailOptions = {
                 from: 'sivamaniramayanam7036@gmail.com',
@@ -835,17 +828,17 @@ const notifyVacancyToStudents = (availableRooms) => {
 const checkRoomVacancies = async () => {
     const roomModels = [UserModel, UserModel1, UserModel2, UserModel3, UserModel4, UserModel5, UserModel6, UserModel7];
     const availableRooms = [];
-    let allRoomsFull = true; // Flag to check if all rooms are full
+    let allRoomsFull = true; 
 
     for (const [index, model] of roomModels.entries()) {
         try {
-            const count = await model.countDocuments({}); // Get the count of students in the room
-            const availableSpots = 4 - count; // Assuming each room can accommodate 4 students
+            const count = await model.countDocuments({}); 
+            const availableSpots = 4 - count; 
 
             // Check if the room has less than 4 students
             if (availableSpots > 0) {
                 availableRooms.push(`Room ${index + 1}: ${availableSpots} available spots.`);
-                allRoomsFull = false; // Set the flag to false if at least one room has available spots
+                allRoomsFull = false; 
             }
         } catch (err) {
             console.log('Error counting documents in room model:', err);
@@ -860,26 +853,29 @@ const checkRoomVacancies = async () => {
     }
 };
 
-// Example usage: Call this function periodically or whenever necessary
-setInterval(checkRoomVacancies, 3600000); // Check every 60 seconds
-
+setInterval(checkRoomVacancies, 60000); // Check every 60 seconds
 // Registration route with email sending
 app.post('/register', (req, res) => {
     const { email, password } = req.body;
-
-    StudentModel.create(req.body)
-        .then(students => {
-            sendRegistrationEmail(email, password); // Send email with credentials
-            checkRoomVacancies(); // Check room vacancies after registration
-            res.json(students);
-        })
-        .catch(err => res.json(err));
+    StudentModel.findOne({ email: email })
+    .then(user => {
+        if (user) {
+            res.json({ message: "Email already exists" }); 
+        } else {
+            StudentModel.create(req.body)
+            .then(students => {
+                sendRegistrationEmail(email, password); 
+                checkRoomVacancies();
+                res.json({ message: "Registration successful", data: students });
+            })
+            .catch(err => res.status(500).json({ message: "Database error", error: err }));
+        }
+    })
+    .catch(err => res.status(500).json({ message: "Server error", error: err }));
 });
-
 // Login route
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
-
     StudentModel.findOne({ email: email })
         .then(user => {
             if (user) {
@@ -894,38 +890,32 @@ app.post('/login', (req, res) => {
         })
         .catch(err => res.json(err));
 });
-
-// CRUD operations for UserModel1 to UserModel8 (same as provided)
-
+// CRUD operations for UserModel1 to UserModel8
 app.get('/users1', (req, res) => {
     UserModel.find({})
         .then(users => res.json(users))
         .catch(err => res.json(err));
 });
-
 app.get('/getUser1/:id', (req, res) => {
     const id = req.params.id;
     UserModel.findById({ _id: id })
         .then(users => res.json(users))
         .catch(err => res.json(err));
 });
-
 app.post('/create1', (req, res) => {
     UserModel.create(req.body)
         .then(users => {
-            checkRoomVacancies(); // Check vacancies when a new user is created
+            checkRoomVacancies(); 
             res.json(users);
         })
         .catch(err => res.json(err));
 });
-
 app.put('/update1/:id', (req, res) => {
     const id = req.params.id;
     UserModel.findByIdAndUpdate({ _id: id }, { name: req.body.name, rollno: req.body.rollno })
         .then(users => res.json(users))
         .catch(err => res.json(err));
 });
-
 app.delete('/deleteUser1/:id', (req, res) => {
     const id = req.params.id;
     UserModel.findByIdAndDelete({ _id: id })
@@ -937,7 +927,6 @@ app.delete('/deleteUser1/:id', (req, res) => {
         UserModel.find({})
         .then(users=>res.json(users))
         .catch(err=>res.json(err))
-
     })
     app.get('/getUser/:id',(req,res)=>{
         const id=req.params.id;
@@ -967,7 +956,6 @@ app.delete('/deleteUser1/:id', (req, res) => {
         UserModel1.find({})
         .then(users2=>res.json(users2))
         .catch(err=>res.json(err))
-
     })
     app.get('/getUser2/:id',(req,res)=>{
         const id=req.params.id;
