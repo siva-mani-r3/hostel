@@ -23,7 +23,7 @@ const Signup = () => {
             return;
         }
 
-        axios.post('http://localhost:3002/register', { name, email, password })
+        axios.post('https://hostel-backend-e7gv.onrender.com/register', { name, email, password })
             .then(result => {
                 if (result.data.message === "Email already exists") {
                     setMessage("Email already exists.");
