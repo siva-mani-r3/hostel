@@ -23,7 +23,7 @@ const Login = () => {
         }
 
       
-        axios.post('http://localhost:3002/login', { email, password })
+        axios.post('https://hostel-backend-e7gv.onrender.com/login', { email, password })
             .then(result => {
                 if (result.data === "success") {
                     navigate('/$2a$12$GUbLTBEOUWUg4FSgaPJSousyzQZkyiRr2dmmVt4OwXmDUbCzh9v22'); 
